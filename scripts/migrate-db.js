@@ -8,4 +8,12 @@ if (args.includes('--local') || args.includes('-L')) {
   process.env.PG_URI = `postgres://${user}:${pw}@localhost:5432/${db}`
 }
 
-// TODO
+const knex = require('../models/db')
+
+knex.migrate.latest().then(() => {
+  console.log('Migration DONE!')
+  process.exit(0)
+}).catch((err) => {
+  console.error('Migration ERROR:', err)
+  process.exit(1)
+})

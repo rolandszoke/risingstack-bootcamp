@@ -1,5 +1,6 @@
 'use strict'
 
+const path = require('path')
 const joi = require('joi')
 const { parse } = require('pg-connection-string')
 
@@ -17,7 +18,7 @@ const envVarsSchema = joi.object({
 const envVars = joi.attempt(process.env, envVarsSchema)
 
 const config = {
-  client: 'pg',
+  client: 'pg', // client adapter used
   connection: Object.assign(
     parse(envVars.PG_URI),
     envVars.PG_SSL_CA || envVars.PG_SSL_KEY || envVars.PG_SSL_CERT
@@ -31,6 +32,9 @@ const config = {
       }
       : {}
   ),
+  migrations: {
+    directory: path.join(__dirname, './migrations')
+  },
   pool: {
     min: envVars.PG_POOL_MIN,
     max: envVars.PG_POOL_MAX
