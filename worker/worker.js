@@ -31,7 +31,15 @@ async function init() {
     }
 
     switch (channel) {
-      // TODO
+      case CHANNELS.collect.trigger.v1:
+        handlers.trigger(messageObject)
+        break
+      case CHANNELS.collect.repository.v1:
+        handlers.repository(messageObject)
+        break
+      case CHANNELS.collect.contributions.v1:
+        handlers.contributions(messageObject)
+        break
       default:
         logger.warn(`Redis message is not handled on channel '${channel}'`, message)
     }
