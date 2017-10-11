@@ -21,26 +21,13 @@ describe('Worker "repository" channel', () => {
       const date = new Date().toISOString()
       const query = 'language:javascript'
       const page = _.random(100)
-      // fake handler
-      const done = new Promise((resolve, reject) => {
-        this.sandbox.stub(handlers, 'repository').callsFake(async (params) => {
-          await worker.halt()
-          try {
-            expect(params).to.eql({ date, query, page })
-          } catch (err) {
-            reject(err)
-            return
-          }
-          resolve()
-        })
-      })
+      const repositoryStub = this.sandbox.stub(handlers, 'repository')
+      const done = new Promise((resolve) => repositoryStub.callsFake(resolve))
       await worker.init()
-      await redis.publishObject(CHANNELS.collect.repository.v1, {
-        date,
-        page,
-        query
-      })
-      return done
+      await redis.publishObject(CHANNELS.collect.repository.v1, { date, page, query })
+      const params = await done
+      expect(params).to.eql({ date, page, query })
+      await worker.halt()
     }
   )
 

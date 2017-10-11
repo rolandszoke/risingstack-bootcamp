@@ -17,22 +17,13 @@ describe('Worker "trigger" channel', () => {
       // create data
       const date = new Date().toISOString()
       const query = 'language:javascript'
-      // fake handler
-      const done = new Promise((resolve, reject) => {
-        this.sandbox.stub(handlers, 'trigger').callsFake(async (params) => {
-          await worker.halt()
-          try {
-            expect(params).to.eql({ date, query })
-          } catch (err) {
-            reject(err)
-            return
-          }
-          resolve()
-        })
-      })
+      const triggerStub = this.sandbox.stub(handlers, 'trigger')
+      const done = new Promise((resolve) => triggerStub.callsFake(resolve))
       await worker.init()
       await redis.publishObject(CHANNELS.collect.trigger.v1, { date, query })
-      return done
+      const params = await done
+      expect(params).to.eql({ date, query })
+      await worker.halt()
     }
   )
 

@@ -27,14 +27,15 @@ async function onContributions(message) {
     line_count: weeks.reduce((lines, { a, d }) => lines + (a - d), 0)
   }))
   // Save user and contribution
-  fp.map(async (e) => {
-    await User.insert(e.user)
-    await Contribution.insertOrReplace({
-      repository: data.repository.id,
-      user: e.user.id,
-      line_count: e.line_count
-    })
-  })(countedLines)
+  await Promise.all(countedLines.map((e) =>
+    User.insert(e.user)
+      .catch((err) => logger.warn('contributions: User insert error', err))
+      .then(() => Contribution.insertOrReplace({
+        repository: data.repository.id,
+        user: e.user.id,
+        line_count: e.line_count
+      }))
+  ))
   logger.debug('contributions: finished', message)
 }
 

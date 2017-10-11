@@ -17,11 +17,11 @@ async function onTrigger(message) {
   // Validation
   const data = joi.attempt(message, schema)
   // Send msg ten times to repository channel
-  _.range(10).map(async (page) => {
-    await redis.publishObject(CHANNELS.collect.repository.v1, {
+  await Promise.all(_.range(10).map((page) => 
+    redis.publishObject(CHANNELS.collect.repository.v1, {
       date: data.date, query: data.query, page
     })
-  })
+  ))
 
   logger.debug('trigger: finished', message)
 }

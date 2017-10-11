@@ -49,9 +49,10 @@ async function init() {
 }
 
 async function halt() {
-  subscriber.disconnect()
-  publisher.disconnect()
-
+  await Promise.all([
+    subscriber.disconnect(),
+    publisher.disconnect()
+  ])
   logger.info('Channels are canceled')
 }
 

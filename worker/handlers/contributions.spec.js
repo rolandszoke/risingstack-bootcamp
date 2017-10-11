@@ -23,25 +23,13 @@ describe('Worker "contributions" channel', () => {
         full_name: 'myRepoName'
       }
       const date = new Date().toISOString()
-      // fake handler
-      const done = new Promise((resolve, reject) => {
-        this.sandbox.stub(handlers, 'contributions').callsFake(async (params) => {
-          await worker.halt()
-          try {
-            expect(params).to.eql({ date, repository })
-          } catch (err) {
-            reject(err)
-            return
-          }
-          resolve()
-        })
-      })
+      const contributionsStub = this.sandbox.stub(handlers, 'contributions')
+      const done = new Promise((resolve) => contributionsStub.callsFake(resolve))
       await worker.init()
-      await redis.publishObject(CHANNELS.collect.contributions.v1, {
-        date,
-        repository
-      })
-      return done
+      await redis.publishObject(CHANNELS.collect.contributions.v1, { date, repository })
+      const params = await done
+      expect(params).to.eql({ date, repository })
+      await worker.halt()
     }
   )
 

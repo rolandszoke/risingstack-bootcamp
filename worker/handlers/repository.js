@@ -22,27 +22,28 @@ async function onRepository(message) {
   // Validation
   const data = joi.attempt(message, schema)
   // gitHub API request
-  const response = await GitHub.api.searchRepositories({ q: data.query, page: data.page, per_page: 100 })
+  let { items } = await GitHub.api.searchRepositories({ q: data.query, page: data.page, per_page: 100 })
   // Modify to database model with fp
-  const owners = response.items.map((e) => (
-    fp.pick(['id', 'login', 'avatar_url', 'html_url', 'type'], e.user)))
-  const repositories = response.items.map((e) => (
-    fp.flow([
+  items = items.map((e) => ({
+    owner: fp.pick(['id', 'login', 'avatar_url', 'html_url', 'type'], e.user),
+    repository: fp.flow([
       fp.pick(['id', 'full_name', 'description', 'html_url', 'language', 'stargazers_count']),
       fp.pickBy(_.identity),
       fp.defaults({ description: '', language: '' }),
       fp.assign({ owner: e.user.id })
     ])(e)
+  }))
+  // Save repository, owner and push message to contributions
+  await Promise.all(items.map(({ owner, repository }) =>
+    User.insert(owner)
+      .catch((err) => logger.warn('repository: User insert error', err))
+      .then(() => Repository.insert(repository))
+      .catch((err) => logger.warn('repository: Repository insert error', err))
+      .then(() => redis.publishObject(CHANNELS.collect.contributions.v1, {
+        date: data.date,
+        repository
+      }))
   ))
-  // Save owner to db
-  fp.map(async (e) => {
-    await User.insert(e)
-  })(owners)
-  // Save repository and push message to contributions
-  fp.map(async (e) => {
-    await Repository.insert(e)
-    await redis.publishObject(CHANNELS.collect.contributions.v1, { date: data.date, repository: e })
-  })(repositories)
   logger.debug('repository: finished', message)
 }
 
