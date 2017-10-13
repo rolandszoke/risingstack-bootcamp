@@ -1,7 +1,23 @@
 'use strict'
 
+const joi = require('joi')
+const compose = require('koa-compose')
+const middleware = require('../../middleware')
+const contribution = require('../../../models/contribution')
+
+const schema = joi.object({
+  id: joi.number().integer().required()
+}).required()
+
 async function getById(ctx) {
-  // TODO
+  console.log('PARAMS:', ctx.params)
+  const result = await contribution.read(ctx.params)
+  console.log('RESULT:', result)
+  if (!result) ctx.status = 404
+  else ctx.body = result
 }
 
-module.exports = getById
+module.exports = compose([
+  middleware.validator({ params: schema }),
+  getById
+])
