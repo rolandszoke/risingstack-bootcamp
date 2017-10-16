@@ -19,11 +19,8 @@ router.get('/hello', (ctx) => {
 
 router.post('/api/v1/trigger', trigger.post)
 router.get('/api/v1/repository/:id', repository.getById)
+router.get('/api/v1/repository/:id/contributions', contribution.getById)
 router.get('/api/v1/repository/:owner/:name', repository.getByName)
 router.get('/api/v1/repository/:owner/:name/contributions', contribution.getByName)
-router.get('/api/v1/repository/:id/contributions', (ctx, next) => {
-  console.log(ctx)
-  next()
-}, contribution.getById)
 
 module.exports = router

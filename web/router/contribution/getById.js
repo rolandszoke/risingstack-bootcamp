@@ -10,9 +10,7 @@ const schema = joi.object({
 }).required()
 
 async function getById(ctx) {
-  console.log('PARAMS:', ctx.params)
   const result = await contribution.read(ctx.params)
-  console.log('RESULT:', result)
   if (!result) ctx.status = 404
   else ctx.body = result
 }

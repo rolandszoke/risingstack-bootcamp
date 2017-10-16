@@ -1,74 +1,142 @@
 FORMAT: 1A
 
-# Polls
+# Bootcamp
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+bootcamp is a simple API.
 
-## Questions Collection [/questions]
+## Trigger [/api/v1/trigger]
 
-### List All Questions [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                {
-                    "choice": "Swift",
-                    "votes": 2048
-                }, {
-                    "choice": "Python",
-                    "votes": 1024
-                }
-            ]
-        }
-
-### Create a New Question [POST]
-You may create your own question using this action.
-This action takes a JSON payload as part of the request.
-Response then return specific header and body.
-
-+ Request (application/json)
-
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
+### Send message to corresponding Redis channel [POST]
 
 + Response 201 (application/json)
-
-    + Headers
-
-            Location: /questions/1
 
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2014-11-11T08:40:51.620Z",
-                "url": "/questions/1",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "url": "/questions/1/choices/1",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "url": "/questions/1/choices/2",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "url": "/questions/1/choices/3",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "url": "/questions/1/choices/4",
-                        "votes": 0
-                    }
-                ]
+                "query" : "language:javascript"
             }
+
+## Repository [/api/v1/repository/{id}]
+
++ Parameters
+    + id (number) - ID of the Repository in the form of an integer
+
+### View a Repositories Detial [GET]
+
++ Response 200 (application/json)
+
+        {
+            {
+                "id": 344,
+                "owner": { 
+                    "id": 410,
+                    "login": 'developer',
+                    "avatar_url": 'https://developer.com/avatar.png',
+                    "html_url": 'https://github.com/developer',
+                    "type": 'User' 
+                },
+                "full_name": '@risingstack/foo',
+                "description": 'Very foo package, using bar technologies',
+                "html_url": 'https://github.com/risingstack/foo',
+                "language": 'Baz',
+                "stargazers_count": 885 
+            }
+        }
+
+## Repository [/api/v1/repository/{owner}/{name}]
+
++ Parameters
+    + owner (string) - Name of the Repository owner in the form of a string
+    + name (string) - Name of the Repository in the form of a string
+
+### View a Repositories Detial [GET]
+
++ Response 200 (application/json)
+
+        {
+            {
+                "id": 344,
+                "owner": 
+                { 
+                    "id": 410,
+                    "login": 'developer',
+                    "avatar_url": 'https://developer.com/avatar.png',
+                    "html_url": 'https://github.com/developer',
+                    "type": 'User' 
+                },
+                "full_name": '@risingstack/foo',
+                "description": 'Very foo package, using bar technologies',
+                "html_url": 'https://github.com/risingstack/foo',
+                "language": 'Baz',
+                "stargazers_count": 885 
+            }
+        }
+        
+## Contributions [/api/v1/repository/{id}/contributions]
+
++ Parameters
+    + id (number) - ID of the Contribution in the form of an integer
+
+### View a Contributions Detial [GET]
+
++ Response 200 (application/json)
+
+        [ 
+            { 
+                "user": 
+                { 
+                    "id": 594,
+                    "login": 'developer',
+                    "avatar_url": 'https://developer.com/avatar.png',
+                    "html_url": 'https://github.com/developer',
+                    "type": 'User' 
+                },
+                "repository":
+                { 
+                    "id": 668,
+                    "owner": 594,
+                    "full_name": '@risingstack/foo',
+                    "description": 'Very foo package, using bar technologies',
+                    "html_url": 'https://github.com/risingstack/foo',
+                    "language": 'Baz',
+                    "stargazers_count": 123 
+                },
+                "line_count": 873 
+            },
+        ...
+        ]
+        
+## Repository [/api/v1/repository/{owner}/{name}/contributions]
+
++ Parameters
+    + owner (string) - Name of the Contributions owner in the form of a string
+    + name (string) - Name of the Contribution in the form of a string
+
+### View a Repositories Detial [GET]
+
++ Response 200 (application/json)
+
+        [ 
+            { 
+                "user": 
+                { 
+                    "id": 594,
+                    "login": 'developer',
+                    "avatar_url": 'https://developer.com/avatar.png',
+                    "html_url": 'https://github.com/developer',
+                    "type": 'User' 
+                },
+                "repository":
+                { 
+                    "id": 668,
+                    "owner": 594,
+                    "full_name": '@risingstack/foo',
+                    "description": 'Very foo package, using bar technologies',
+                    "html_url": 'https://github.com/risingstack/foo',
+                    "language": 'Baz',
+                    "stargazers_count": 123 
+                },
+                "line_count": 873 
+            },
+        ...
+        ]

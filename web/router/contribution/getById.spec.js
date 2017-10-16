@@ -17,10 +17,9 @@ describe(`GET ${url}`, () => {
     // Make request, expect 200
     const { body } = await request(server.listen())
       .get(`/api/v1/repository/${id}/contributions`)
-      //.expect(200)
+      .expect(200)
       .json(true)
       .end()
-    console.log({ body })
     // Expect same id and read call
     expect(contribution.read).to.have.been.calledWith({ id })
     expect(body).to.eql({ id })
