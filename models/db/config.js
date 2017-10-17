@@ -11,7 +11,8 @@ const envVarsSchema = joi.object({
   PG_SSL_CERT: joi.string(),
   PG_SSL_ALLOW_UNAUTHORIZED: joi.boolean().truthy('true').falsy('false').default(true),
   PG_POOL_MIN: joi.number().default(1),
-  PG_POOL_MAX: joi.number().default(20)
+  PG_POOL_MAX: joi.number().default(20),
+  PG_HEALTH_CHECK_TIMEOUT: joi.number().integer().default(2000)
 }).unknown()
   .required()
 
@@ -38,7 +39,8 @@ const config = {
   },
   migrations: {
     directory: path.join(__dirname, './migrations')
-  }
+  },
+  healthCheck: envVars.PG_HEALTH_CHECK_TIMEOUT
 }
 
 module.exports = config
